@@ -23,6 +23,13 @@ def calculate(operation, num1, num2=None):
             result = multiply(num1, num2)
         elif operation == "divide":
             result = divide(num1, num2)
+        elif operation == "power":
+            result = power(num1, num2)
+        elif operation == "square_root" or operation == "sqrt":
+            result = square_root(num1)
+
+
+
         else:
             click.echo(f"Unknown operation: {operation}")
             sys.exit(1)
@@ -41,5 +48,5 @@ def calculate(operation, num1, num2=None):
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     calculate()
