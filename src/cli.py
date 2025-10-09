@@ -3,7 +3,6 @@ Command Line Interface for Calculator
 Example: python src/cli.py add 5 3
 """
 
-import sys
 import click
 from src.calculator import add, subtract, multiply, divide, power, square_root
 
@@ -13,38 +12,54 @@ from src.calculator import add, subtract, multiply, divide, power, square_root
 @click.argument("num1", type=float)
 @click.argument("num2", type=float, required=False)
 def calculate(operation, num1, num2=None):
-    """Simple calculator CLI"""
+    """Simple calculator CLI with proper error handling."""
     try:
         if operation == "add":
+            if num2 is None:
+                raise click.ClickException("Missing second operand for addition")
             result = add(num1, num2)
-        elif operation == "subtract":
-            result = subtract(num1, num2)
-        elif operation == "multiply":
-            result = multiply(num1, num2)
-        elif operation == "divide":
-            result = divide(num1, num2)
-        elif operation == "power":
-            result = power(num1, num2)
-        elif operation in ("square_root", "sqrt"):
-            result = square_root(num1)
-        else:
-            click.echo(f"Unknown operation: {operation}")
-            sys.exit(1)
 
-        # Format result nicely
+        elif operation == "subtract":
+            if num2 is None:
+                raise click.ClickException("Missing second operand for subtraction")
+            result = subtract(num1, num2)
+
+        elif operation == "multiply":
+            if num2 is None:
+                raise click.ClickException("Missing second operand for multiplication")
+            result = multiply(num1, num2)
+
+        elif operation == "divide":
+            if num2 is None:
+                raise click.ClickException("Missing second operand for division")
+            result = divide(num1, num2)
+
+        elif operation == "power":
+            if num2 is None:
+                raise click.ClickException("Missing exponent for power operation")
+            result = power(num1, num2)
+
+        elif operation in ("sqrt", "square_root"):
+            result = square_root(num1)
+
+        else:
+            raise click.ClickException(f"Unknown operation: {operation}")
+
+        # Format result nicely: integer if whole number, else 2 decimals
         if result == int(result):
             click.echo(int(result))
         else:
             click.echo(f"{result:.2f}")
 
-    except ValueError as e:
-        click.echo(f"Error: {e}")
-        sys.exit(1)
+    except ZeroDivisionError:
+        raise click.ClickException("Cannot divide by zero")
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        click.echo(f"Unexpected error: {e}")
-        sys.exit(1)
+    except ValueError as e:
+        raise click.ClickException(f"Error: {e}")
+
+    except Exception as e:
+        raise click.ClickException(f"Unexpected error: {e}")
 
 
 if __name__ == "__main__":
-    calculate()  # pylint: disable=no-value-for-parameter
+    calculate()
